@@ -27,7 +27,7 @@ def CG_Kmeans(df, ks, manual, feature_red, want_graphs):
     SSE = []
     BIC = []
     for k in np.arange(1,ks):
-        model = KMeans(n_clusters = k, init = 'random', max_iter = 10).fit(df)
+        model = KMeans(n_clusters = k, init = 'random').fit(df)
         SSE.append(model.inertia_)
         
         temp = observations*np.log(SSE[k-1]/observations) + features*k*np.log(observations)

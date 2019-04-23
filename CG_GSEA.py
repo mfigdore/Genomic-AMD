@@ -22,12 +22,13 @@ def CG_GSEA(df, labels):
         if i not in total_labels:
             total_labels.append(i)
     
+    alpha = 0.05*len(total_labels)
+    
     p_values_columns = []
     for i in range(len(total_labels)-1):
         for j in range(i+1,len(total_labels)):
             p_values_columns.append(str(i)+'_' + str(j))
         
-    
     total_p_values = np.zeros(len(p_values_columns))
     count = 0
     for k in range(len(df.columns)):
@@ -53,7 +54,6 @@ def CG_GSEA(df, labels):
     total_p_values_1 = pd.DataFrame(np.transpose(total_p_values_1), columns = ['p_value', 'ID'])
     total_p_values_1 = total_p_values_1.sort_values(by=['p_value'])
     
-    alpha = 0.1
     BH = np.arange(1, len(total_p_values_1)+1)*(alpha/len(total_p_values_1))
     total_p_values_1['BH'] = BH
     total_p_values_1['Bonferroni'] = alpha/len(total_p_values_1)
@@ -65,7 +65,11 @@ def CG_GSEA(df, labels):
     sig_ID = np.array(total_p_values_1[total_p_values_1['BH_sig'] == True]['ID'].values, dtype = int)
     sig_genes = []
     for i in sig_ID:
-        sig_genes.append([(i//len(p_values_columns))+1, int(p_values_columns[i%len(p_values_columns)].split('_')[0]), int(p_values_columns[i%len(p_values_columns)].split('_')[1])])
+        sig_genes.append([(i//len(p_values_columns)), int(p_values_columns[i%len(p_values_columns)].split('_')[0]), int(p_values_columns[i%len(p_values_columns)].split('_')[1])])
     
-    return np.array(sig_genes)
+    new_sig_genes = []
+    for i in sig_genes:
+        temp = [df.columns[i[0]], i[1], i[2]]
+        new_sig_genes.append(temp)
     
+    return new_sig_genes
